@@ -1,0 +1,128 @@
+---
+title: "Home"
+description: "Script.apex is a library that evaluates Javascript expressions in Apex."
+---
+
+{namespace pageIndex}
+
+/**
+ */
+{template .render}
+	{@param site: ?}
+
+	{call main.render data="all"}
+		{param content kind="html"}
+			{call .header data="all" /}
+			{call .why /}
+			{call .features /}
+			{call .how /}
+			{call .highlights /}
+			{call Footer.render data="all" /}
+		{/param}
+	{/call}
+{/template}
+
+/**
+ */
+{template .header}
+	{@param site: ?}
+
+	<header class="header">
+		<div class="container">
+			<h1 class="header-title">{$site.title}</h1>
+			<h2 class="header-subtitle">{$site.index.description}</h2>
+			<div class="header-cta">
+				<a href="/script-apex/tutorials/getting_started/step_1.html" class="btn btn-accent">Get Started</a>
+			</div>
+		</div>
+	</header>
+{/template}
+
+/**
+ */
+{template .why}
+	<article class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-2">
+					<h3 class="about-title">Why Script.apex?</h3>
+					<p class="about-description">Script.apex help you run JavaScript code in Apex. Basically, it compiles JavaScript code into semantic nodes, which are then evaluated in native Apex. The JavaScript expression parser in Script.apex is porting from <a href="http://jsep.from.so/">jsep</a>.</p>
+				</div>
+			</div>
+		</div>
+	</article>
+{/template}
+
+/**
+ */
+{template .features}
+	<div class="features">
+		<div class="container">
+			<div class="row">
+				<section class="feature col-md-4 col-md-offset-2">
+					<h3 class="feature-title">Expression Parsing</h3>
+					<p class="feature-description">Script.apex parses JavaScript expressions into symantic nodes.</p>
+				</section>
+				<section class="feature col-md-4">
+					<h3 class="feature-title">Expression Evaluation</h3>
+					<p class="feature-description">Script.apex evaluates JavaScript expressions to compute the result.</p>
+				</section>
+				<section class="feature col-md-4">
+					<h3 class="feature-title">Cached Parsing</h3>
+					<p class="feature-description">Script.apex caches parsed JavaScript expressions to improve performance.</p>
+				</section>
+			</div>
+		</div>
+	</div>
+{/template}
+
+/**
+ */
+{template .how}
+	<article class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-2">
+					<h3 class="about-title">Only One API</h3>
+					<p class="about-description">To evaluate a JavaScript expression in Script.apex, you really need only one API. That's it.</p>
+				</div>
+			</div>
+		</div>
+	</article>
+{/template}
+
+/**
+ */
+{template .highlights}
+	<div class="highlights">
+		<div class="container">
+			<section class="highlight row">
+				<div class="col-md-6 col-md-offset-2">
+					<h4 class="highlight-title">Script Evaluation</h4>
+					<p class="highlight-description">Script.apex evaluates JavaScript expressions to provide dynamic scripting feature to Apex.</p>
+				</div>
+				<div class="col-md-5 col-md-offset-1">
+					<img class="highlight-image" src="/script-apex/images/highlight_1.png" alt="Fluent API" height="200">
+				</div>
+			</section>
+			<section class="highlight row">
+				<div class="col-md-6 col-md-push-9">
+					<h4 class="highlight-title">Context Evaluation</h4>
+					<p class="highlight-description">Script.apex uses variables from context to provide dynamic evaluations.</p>
+				</div>
+				<div class="col-md-5 col-md-offset-2 col-md-pull-6">
+					<img class="highlight-image" src="/script-apex/images/highlight_2.png" alt="Collection Support" height="200">
+				</div>
+			</section>
+			<section class="highlight row">
+				<div class="col-md-6 col-md-offset-2">
+					<h4 class="highlight-title">Symantic Node</h4>
+					<p class="highlight-description">Script.apex creates parsed symantic nodes right at your disposal.</p>
+				</div>
+				<div class="col-md-5 col-md-offset-1">
+					<img class="highlight-image" src="/script-apex/images/highlight_3.png" alt="Function Composition" height="200">
+				</div>
+			</section>
+		</div>
+	</div>
+{/template}
