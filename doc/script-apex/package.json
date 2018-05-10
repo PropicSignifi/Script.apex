@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "r-apex",
+  "name": "script-apex",
   "version": "0.0.0",
   "scripts": {
     "start": "electric"
