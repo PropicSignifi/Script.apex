@@ -124,6 +124,18 @@ private class ScriptEngineTest {
             3,
             ScriptEngine.getInstance().eval(node, new Map<String, Object>{ 'a' => new List<Object>{ 3 } })
         );
+
+        node = new Jsep('a[0]').parse();
+        System.assertEquals(
+            '3',
+            ScriptEngine.getInstance().eval(node, new Map<String, Object>{ 'a' => '345' })
+        );
+
+        node = new Jsep('a.Description').parse();
+        System.assertEquals(
+            'desc',
+            ScriptEngine.getInstance().eval(node, new Map<String, Object>{ 'a' => new Account(Description = 'desc')})
+        );
     }
 
     @IsTest
@@ -152,5 +164,141 @@ private class ScriptEngineTest {
     @IsTest
     private static void instanceTest() {
         System.assert(ScriptEngine.getInstance() != null);
+    }
+
+    @IsTest
+    private static void evalTest() {
+        System.assertEquals('abc', ScriptEngine.getInstance().eval('"a" + "b" + "c"'));
+    }
+
+    @IsTest
+    private static void evalContextTest() {
+        Map<String, Object> context = new Map<String, Object>{
+            'a' => true,
+            'b' => false
+        };
+        System.assertEquals(false, ScriptEngine.getInstance().eval('a && b', context));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a || b', context));
+    }
+
+    @IsTest
+    private static void callTest() {
+        System.assertEquals(null, ScriptEngine.getInstance().eval('test(1)'));
+    }
+
+    @IsTest
+    private static void assignmentTest() {
+        System.assertEquals(null, ScriptEngine.getInstance().eval('a = 1'));
+    }
+
+    @IsTest
+    private static void moreUnaryTest() {
+        System.assertEquals(-1, ScriptEngine.getInstance().eval('-1'));
+
+        System.assertEquals(1, ScriptEngine.getInstance().eval('+1'));
+
+        System.assertEquals(false, ScriptEngine.getInstance().eval('!true'));
+
+        System.assertEquals(2, ScriptEngine.getInstance().eval('++1'));
+
+        System.assertEquals(0, ScriptEngine.getInstance().eval('--1'));
+    }
+
+    @IsTest
+    private static void moreBinaryTest() {
+        System.assertEquals(true, ScriptEngine.getInstance().eval(' 1 == 1'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval(' 1 != 2'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval(' 1 < 2'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval(' 3 > 2'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval(' 1 <= 2'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval(' 3 >= 2'));
+
+        System.assertEquals(1, ScriptEngine.getInstance().eval('1 + 0'));
+        System.assertEquals(1, ScriptEngine.getInstance().eval('1 - 0'));
+        System.assertEquals(1, ScriptEngine.getInstance().eval('1 * 1'));
+        System.assertEquals(1, ScriptEngine.getInstance().eval('1 / 1'));
+        System.assertEquals(1, ScriptEngine.getInstance().eval('1 % 2'));
+
+        System.assertEquals(true, ScriptEngine.getInstance().eval('"a" == "a"'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('"a" != "b"'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('"a" < "b"'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('"c" > "b"'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('"a" <= "b"'));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('"c" >= "b"'));
+
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a == b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).date(),
+            'b' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).date()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a != b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).date(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).date()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a < b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).date(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).date()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a <= b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).date(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).date()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a > b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 3, 3, 0, 0).date(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).date()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a >= b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 3, 3, 0, 0).date(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).date()
+        }));
+
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a == b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).time(),
+            'b' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).time()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a != b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).time(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).time()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a < b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).time(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).time()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a <= b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0).time(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).time()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a > b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 3, 3, 0, 0).time(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).time()
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a >= b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 3, 3, 0, 0).time(),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0).time()
+        }));
+
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a == b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0),
+            'b' => Datetime.newInstance(2018, 1, 1, 1, 0, 0)
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a != b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0)
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a < b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0)
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a <= b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 1, 1, 0, 0),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0)
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a > b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 3, 3, 0, 0),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0)
+        }));
+        System.assertEquals(true, ScriptEngine.getInstance().eval('a >= b', new Map<String, Object>{
+            'a' => Datetime.newInstance(2018, 1, 3, 3, 0, 0),
+            'b' => Datetime.newInstance(2018, 1, 2, 2, 0, 0)
+        }));
     }
 }

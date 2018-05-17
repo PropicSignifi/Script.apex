@@ -51,7 +51,7 @@ public virtual class ScriptEngine {
             return ((Map<String, Object>)target).get(property);
         }
         else if(target instanceof String && isInteger(property)) {
-            return ((String)target).charAt(Integer.valueOf(property));
+            return ((String)target).split('').get(Integer.valueOf(property));
         }
         else if(target instanceof SObject) {
             return ((SObject)target).get(property);
@@ -359,8 +359,8 @@ public virtual class ScriptEngine {
             }
         }
         else if(operator == '%') {
-            if(left instanceof Long && right instanceof Long) {
-                return Math.mod(((Long)left), ((Long)right));
+            if(left instanceof Decimal && right instanceof Decimal) {
+                return Math.mod(((Decimal)left).longValue(), ((Decimal)right).longValue());
             }
             else {
                 throw new EvalException('Failed to execute "%" on objects');
