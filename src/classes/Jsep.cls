@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  **/
+ //https://github.com/Click-to-Cloud/Script.apex
 public class Jsep {
     // `index` stores the character number we are currently at while `length` is a constant
     // All of the gobbles below will modify `index` as we move along
@@ -334,6 +335,8 @@ public class Jsep {
         return new LiteralNode(Decimal.valueOf(num), num);
     }
 
+    static Pattern datetimePattern = Pattern.compile('(^\\d{4}-[01]?\\d-[0-3]?\\dT[0-2]?\\d:[0-5]?\\d:[0-5]?\\d(?:\\.\\d+)?Z?)|(^\\d{4}-[01]?\\d-[0-3]?\\d)|([0-2]?\\d:[0-5]?\\d:[0-5]?\\d(?:\\.\\d+)?Z?)');
+
     // An individual part of a binary expression:
     // e.g. `foo.bar(baz)`, `1`, `"abc"`, `(a % 2)` (because it's in parenthesis)
     private Node gobbleToken() {
@@ -343,8 +346,35 @@ public class Jsep {
 
         gobbleSpaces();
         ch = exprICode(index);
+        Boolean isDigit = isDecimalDigit(ch);
+        if(isDigit)
+        {
+            //Datetime (24 characters long): 2018-06-05T10:00:00.000Z
+            //Date: 2018-07-22, 2019-7-22, 2019-7-02, 2019-7-2
+            //Time: 16:02:03.004Z
+            Integer endIndex = index + 24;
+            String subStr = this.expr.substring(index, endIndex>this.length? this.length : endIndex);
+            Matcher m = datetimePattern.matcher(subStr);
+            if(m.find())
+            {
+                String vStr = m.group(0);
+                this.index += vStr.length();
 
-        if(isDecimalDigit(ch) || ch == PERIOD_CODE) {
+                if(vStr.indexOf('T')>0)
+                {
+                    return new DatetimeNode((Datetime)JSON.deserialize('"' + vStr + '"', Datetime.class), vStr);
+                }
+
+                if(vStr.indexOf('-')>0)
+                {
+                    return new DateNode(Date.valueOf(vStr), vStr);
+                }
+
+                return new TimeNode((Time)JSON.deserialize('"' + vStr + '"', Time.class), vStr);
+            }
+        }
+
+        if( isDigit || ch == PERIOD_CODE) {
             // Char code 46 is a dot `.` which can start off a numeric literal
             return gobbleNumericLiteral();
         } else if(ch == SQUOTE_CODE || ch == DQUOTE_CODE) {
@@ -525,6 +555,11 @@ public class Jsep {
     public static final String IDENTIFIER = 'Identifier';
     public static final String MEMBER_EXP = 'MemberExpression';
     public static final String LITERAL = 'Literal';
+
+    public static final String JSEP_DATE = 'Date';
+    public static final String JSEP_DATETIME = 'Datetime';
+    public static final String JSEP_TIME = 'Time';
+
     public static final String THIS_EXP = 'ThisExpression';
     public static final String CALL_EXP = 'CallExpression';
     public static final String UNARY_EXP = 'UnaryExpression';
@@ -680,91 +715,91 @@ public class Jsep {
     }
 
     /**
-	 * Add unary op
+     * Add unary op
      *
-	 * @param op_name The op name
-	 */
-	public static void addUnaryOp(String op_name) {
-		max_unop_len = Math.max(op_name.length(), max_unop_len);
+     * @param op_name The op name
+     */
+    public static void addUnaryOp(String op_name) {
+        max_unop_len = Math.max(op_name.length(), max_unop_len);
         unary_ops.put(op_name, t);
-	}
+    }
 
-	/**
-	 * Add binary op
+    /**
+     * Add binary op
      *
-	 * @param op_name
-	 * @param precedence
-	 */
-	public static void addBinaryOp(String op_name, Integer precedence) {
-		max_binop_len = Math.max(op_name.length(), max_binop_len);
+     * @param op_name
+     * @param precedence
+     */
+    public static void addBinaryOp(String op_name, Integer precedence) {
+        max_binop_len = Math.max(op_name.length(), max_binop_len);
         binary_ops.put(op_name, precedence);
-	}
+    }
 
-	/**
-	 * Add literal
+    /**
+     * Add literal
      *
-	 * @param literal_name
-	 * @param literal_value
-	 */
-	public static void addLiteral(String literal_name, Object literal_value) {
+     * @param literal_name
+     * @param literal_value
+     */
+    public static void addLiteral(String literal_name, Object literal_value) {
         literals.put(literal_name, literal_value);
-	}
+    }
 
-	/**
-	 * Remove unary op
+    /**
+     * Remove unary op
      *
-	 * @param op_name
-	 */
-	public static void removeUnaryOp(String op_name) {
+     * @param op_name
+     */
+    public static void removeUnaryOp(String op_name) {
         unary_ops.remove(op_name);
-		if(op_name.length() == max_unop_len) {
-			max_unop_len = getMaxKeyLen(unary_ops);
-		}
-	}
+        if(op_name.length() == max_unop_len) {
+            max_unop_len = getMaxKeyLen(unary_ops);
+        }
+    }
 
-	/**
-	 * Remove all unary ops
-	 */
-	public static void removeAllUnaryOps() {
-		unary_ops.clear();
-		max_unop_len = 0;
-	}
+    /**
+     * Remove all unary ops
+     */
+    public static void removeAllUnaryOps() {
+        unary_ops.clear();
+        max_unop_len = 0;
+    }
 
-	/**
-	 * Remove binary op
+    /**
+     * Remove binary op
      *
-	 * @param op_name
-	 */
-	public static void removeBinaryOp(String op_name) {
+     * @param op_name
+     */
+    public static void removeBinaryOp(String op_name) {
         binary_ops.remove(op_name);
-		if(op_name.length() == max_binop_len) {
-			max_binop_len = getMaxKeyLen(binary_ops);
-		}
-	}
+        if(op_name.length() == max_binop_len) {
+            max_binop_len = getMaxKeyLen(binary_ops);
+        }
+    }
 
-	/**
-	 * Remove all binary ops
-	 */
-	public static void removeAllBinaryOps() {
-		binary_ops.clear();
-		max_binop_len = 0;
-	}
+    /**
+     * Remove all binary ops
+     */
+    public static void removeAllBinaryOps() {
+        binary_ops.clear();
+        max_binop_len = 0;
+    }
 
-	/**
-	 * Remove literal
+    /**
+     * Remove literal
      *
-	 * @param literal_name
-	 */
-	public static void removeLiteral(String literal_name) {
+     * @param literal_name
+     */
+    public static void removeLiteral(String literal_name) {
         literals.remove(literal_name);
-	}
+    }
 
-	/**
-	 * Remove all literals
-	 */
-	public static void removeAllLiterals() {
-		literals.clear();
-	}
+    /**
+     * Remove all literals
+     */
+    public static void removeAllLiterals() {
+        literals.clear();
+    }
 
 
     private class BiopInfo {
@@ -812,6 +847,50 @@ public class Jsep {
             return IDENTIFIER;
         }
     }
+
+    public class DateNode implements Node {
+        public Object value;
+        public String raw;
+
+        public DateNode(Object value, String raw) {
+            this.value = value;
+            this.raw = raw;
+        }
+
+        public String getType() {
+            return JSEP_DATE;
+        }
+    }
+
+    public class DatetimeNode implements Node {
+        public Object value;
+        public String raw;
+
+        public DatetimeNode(Object value, String raw) {
+            this.value = value;
+            this.raw = raw;
+        }
+
+        public String getType() {
+            return JSEP_DATETIME;
+        }
+    }
+
+
+    public class TimeNode implements Node {
+        public Object value;
+        public String raw;
+
+        public TimeNode(Object value, String raw) {
+            this.value = value;
+            this.raw = raw;
+        }
+
+        public String getType() {
+            return JSEP_TIME;
+        }
+    }
+
 
     public class MemberExpressionNode implements Node {
         public Boolean computed;
