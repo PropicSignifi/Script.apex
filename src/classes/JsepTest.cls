@@ -118,6 +118,96 @@ private class JsepTest {
         System.assertEquals(node.value, 'wilson');
     }
 
+
+
+     //Datetime (24 characters long): 2018-06-05T10:00:00.000Z
+            //Date: 2018-07-22, 2019-7-22, 2019-7-02, 2019-7-2
+            //Time: 16:02:03.004Z
+    @IsTest
+    private static void datetimeNodeTypeTest() {
+
+        Jsep.Node node = new Jsep('"2019-07-24T01:08:54.474Z"').parse();
+        System.assertEquals(node.getType(), Jsep.LITERAL);
+
+        node = new Jsep('"2019-07-24"').parse();
+        System.assertEquals(node.getType(), Jsep.LITERAL);
+
+        node = new Jsep('"01:08:54.474Z"').parse();
+        System.assertEquals(node.getType(), Jsep.LITERAL);
+
+        node = new Jsep('2019-07-24T01:08:54.474Z').parse();
+        System.assertEquals(node.getType(), Jsep.JSEP_DATETIME);
+
+        node = new Jsep('2019-07-24').parse();
+        System.assertEquals(node.getType(), Jsep.JSEP_DATE);
+
+        node = new Jsep('01:08:54.474Z').parse();
+        System.assertEquals(node.getType(), Jsep.JSEP_TIME);
+    }
+
+    @IsTest
+    private static void datetimeTest() {
+        String s = '2019-07-24T01:08:54.474Z';
+        String s2= '2019-7-24T01:08:54.474Z';
+        String s3= '2019-7-24T1:8:54.474Z';
+        Datetime v = (Datetime)JSON.deserialize('"' + s + '"', Datetime.class);
+        Jsep.DatetimeNode node = (Jsep.DatetimeNode)new Jsep(s).parse();
+        System.assertEquals(node.value, v);
+        System.assertEquals(node.getType(), Jsep.JSEP_DATETIME);
+
+        node = (Jsep.DatetimeNode)new Jsep(s2).parse();
+        System.assertEquals(node.value, v);
+
+        node = (Jsep.DatetimeNode)new Jsep(s3).parse();
+        System.assertEquals(node.value, v);
+    }
+
+    @IsTest
+    private static void dateTest() {
+        String s = '2019-07-04';
+        String s2= '2019-7-4';
+        String s3= '2019-7-04';
+        Date v = (Date)JSON.deserialize('"' + s + '"', Date.class);
+        Jsep.DateNode node = (Jsep.DateNode)new Jsep(s).parse();
+        System.assertEquals(node.value, v);
+        System.assertEquals(node.getType(), Jsep.JSEP_DATE);
+
+        node = (Jsep.DateNode)new Jsep(s2).parse();
+        System.assertEquals(node.value, v);
+        System.assertEquals(node.getType(), Jsep.JSEP_DATE);
+
+        node = (Jsep.DateNode)new Jsep(s3).parse();
+        System.assertEquals(node.value, v);
+        System.assertEquals(node.getType(), Jsep.JSEP_DATE);
+    }
+
+    @IsTest
+    private static void timeTest() {
+        String s = '01:08:54.474';
+        String s2= '1:08:54.474';
+        String s3= '1:8:54.474';
+        String s4= '1:8:54.474Z';
+        Time v = (Time)JSON.deserialize('"' + s + '"', Time.class);
+        Jsep.TimeNode node = (Jsep.TimeNode )new Jsep(s).parse();
+        System.assertEquals(node.value, v);
+        System.assertEquals(node.getType(), Jsep.JSEP_TIME);
+
+        node = (Jsep.TimeNode )new Jsep(s2).parse();
+        System.assertEquals(node.value, v);
+        System.assertEquals(node.getType(), Jsep.JSEP_TIME);
+
+        node = (Jsep.TimeNode )new Jsep(s3).parse();
+        System.assertEquals(node.value, v);
+        System.assertEquals(node.getType(), Jsep.JSEP_TIME);
+
+        node = (Jsep.TimeNode )new Jsep(s4).parse();
+        System.assertEquals(true, node.value!=v);
+        System.assertEquals(node.getType(), Jsep.JSEP_TIME);
+    }
+
+
+
+
     @IsTest
     private static void arrayTest() {
         Jsep.ArrayExpressionNode node = (Jsep.ArrayExpressionNode)new Jsep('[ 1, 2, 3 ]').parse();

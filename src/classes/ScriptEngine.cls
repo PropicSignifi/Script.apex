@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  **/
+ //https://github.com/Click-to-Cloud/Script.apex
 public virtual class ScriptEngine {
     private static final Map<String, ScriptEngine> engines = new Map<String, ScriptEngine>{
         'apex' => new ApexScriptEngine()
@@ -41,22 +42,22 @@ public virtual class ScriptEngine {
 
     protected virtual Object evalIdentifier(String name, Map<String, Object> context) {
         return context.get(name);
+
     }
 
     protected virtual Object evalMember(Object target, String property, Map<String, Object> context) {
         if(target instanceof List<Object> && isInteger(property)) {
             return ((List<Object>)target).get(Integer.valueOf(property));
         }
-        else if(target instanceof Map<String, Object>) {
+        if(target instanceof Map<String, Object>) {
             return ((Map<String, Object>)target).get(property);
         }
-        else if(target instanceof String && isInteger(property)) {
+        if(target instanceof String && isInteger(property)) {
             return ((String)target).split('').get(Integer.valueOf(property));
         }
-        else if(target instanceof SObject) {
+        if(target instanceof SObject) {
             return ((SObject)target).get(property);
         }
-
         throw new EvalException('Cannot evaluate "' + property + '" of "' + String.valueOf(target) + '"');
     }
 
@@ -79,7 +80,6 @@ public virtual class ScriptEngine {
             node = new Jsep(code).parse();
             cache.put(code, node);
         }
-
         return this.eval(node, context);
     }
 
@@ -95,40 +95,49 @@ public virtual class ScriptEngine {
         if(node instanceof Jsep.CompoundNode) {
             return eval((Jsep.CompoundNode)node, context);
         }
-        else if(node instanceof Jsep.IdentifierNode) {
+        if(node instanceof Jsep.IdentifierNode) {
             return eval((Jsep.IdentifierNode)node, context);
         }
-        else if(node instanceof Jsep.MemberExpressionNode) {
+        if(node instanceof Jsep.MemberExpressionNode) {
             return eval((Jsep.MemberExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.LiteralNode) {
+        if(node instanceof Jsep.LiteralNode) {
             return eval((Jsep.LiteralNode)node, context);
         }
-        else if(node instanceof Jsep.ThisExpressionNode) {
+        if(node instanceof Jsep.DatetimeNode) {
+            return eval((Jsep.DatetimeNode)node, context);
+        }
+        if(node instanceof Jsep.DateNode) {
+            return eval((Jsep.DateNode)node, context);
+        }
+        if(node instanceof Jsep.TimeNode) {
+            return eval((Jsep.TimeNode)node, context);
+        }
+        if(node instanceof Jsep.ThisExpressionNode) {
             return eval((Jsep.ThisExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.CallExpressionNode) {
+        if(node instanceof Jsep.CallExpressionNode) {
             return eval((Jsep.CallExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.UnaryExpressionNode) {
+        if(node instanceof Jsep.UnaryExpressionNode) {
             return eval((Jsep.UnaryExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.BinaryExpressionNode) {
+        if(node instanceof Jsep.BinaryExpressionNode) {
             return eval((Jsep.BinaryExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.LogicalExpressionNode) {
+        if(node instanceof Jsep.LogicalExpressionNode) {
             return eval((Jsep.LogicalExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.ConditionalExpressionNode) {
+        if(node instanceof Jsep.ConditionalExpressionNode) {
             return eval((Jsep.ConditionalExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.ArrayExpressionNode) {
+        if(node instanceof Jsep.ArrayExpressionNode) {
             return eval((Jsep.ArrayExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.AssignmentExpressionNode) {
+        if(node instanceof Jsep.AssignmentExpressionNode) {
             return eval((Jsep.AssignmentExpressionNode)node, context);
         }
-        else if(node instanceof Jsep.ObjectExpressionNode) {
+        if(node instanceof Jsep.ObjectExpressionNode) {
             return eval((Jsep.ObjectExpressionNode)node, context);
         }
 
@@ -165,6 +174,18 @@ public virtual class ScriptEngine {
         return node.value;
     }
 
+    public Object eval(Jsep.DatetimeNode node, Map<String, Object> context) {
+        return node.value;
+    }
+
+    public Object eval(Jsep.DateNode node, Map<String, Object> context) {
+        return node.value;
+    }
+
+    public Object eval(Jsep.TimeNode node, Map<String, Object> context) {
+        return node.value;
+    }
+
     public Object eval(Jsep.ThisExpressionNode node, Map<String, Object> context) {
         return this.evalThis(context);
     }
@@ -186,214 +207,196 @@ public virtual class ScriptEngine {
             if(val instanceof Decimal) {
                 return -((Decimal)val);
             }
-            else {
-                throw new EvalException('Failed to execute "-" on non-number');
-            }
+            throw new EvalException('Failed to execute "-" on non-number');
+
         }
-        else if(op == '!') {
+        if(op == '!') {
             if(val instanceof Boolean) {
                 return !((Boolean)val);
             }
-            else {
-                throw new EvalException('Failed to execute "!" on non-boolean');
-            }
+            throw new EvalException('Failed to execute "!" on non-boolean');
         }
-        else if(op == '+') {
+        if(op == '+') {
             if(val instanceof Decimal) {
                 return +((Decimal)val);
             }
-            else {
-                throw new EvalException('Failed to execute "+" on non-number');
-            }
+            throw new EvalException('Failed to execute "+" on non-number');
+
         }
-        else if(op == '++') {
+        if(op == '++') {
             if(val instanceof Decimal) {
                 return ((Decimal)val) + 1;
             }
-            else {
-                throw new EvalException('Failed to execute "++" on non-number');
-            }
+            throw new EvalException('Failed to execute "++" on non-number');
+
         }
-        else if(op == '--') {
+        if(op == '--') {
             if(val instanceof Decimal) {
                 return ((Decimal)val) - 1;
             }
-            else {
-                throw new EvalException('Failed to execute "--" on non-number');
-            }
+            throw new EvalException('Failed to execute "--" on non-number');
+
         }
-        else {
-            throw new EvalException('Unsupported operator for "' + op + '"');
-        }
+        throw new EvalException('Unsupported operator for "' + op + '"');
+
     }
 
     public Object eval(Jsep.BinaryExpressionNode node, Map<String, Object> context) {
+
         Object left = this.eval(node.left, context);
         Object right = this.eval(node.right, context);
         String operator = node.operator;
         if(operator == '==') {
             return left == right;
         }
-        else if(operator == '!=') {
+        if(operator == '!=') {
             return left != right;
         }
-        else if(operator == '===') {
+        if(operator == '===') {
             return left == right;
         }
-        else if(operator == '!==') {
+        if(operator == '!==') {
             return left != right;
         }
-        else if(operator == '<') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        Boolean leftIsNull = (left == null);
+        Boolean rightIsNull = (right == null);
+
+        if(operator == '<') {
+
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) < ((Decimal)right);
             }
-            else if(left instanceof String && right instanceof String) {
+            if((leftIsNull || left instanceof String) && (rightIsNull || right instanceof String)) {
                 return ((String)left) < ((String)right);
             }
-            else if(left instanceof Date && right instanceof Date) {
+            if((leftIsNull || left instanceof Date) && (rightIsNull || right instanceof Date)) {
                 return ((Date)left) < ((Date)right);
             }
-            else if(left instanceof Time && right instanceof Time) {
+            if((leftIsNull || left instanceof Time) && (rightIsNull || right instanceof Time)) {
                 return ((Time)left) < ((Time)right);
             }
-            else if(left instanceof Datetime && right instanceof Datetime) {
+            if((leftIsNull || left instanceof Datetime) && (rightIsNull || right instanceof Datetime)) {
                 return ((Datetime)left) < ((Datetime)right);
             }
-            else {
-                throw new EvalException('Failed to execute "<" on objects');
-            }
+            throw new EvalException('Failed to execute "<" on objects');
+
         }
-        else if(operator == '>') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '>') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) > ((Decimal)right);
             }
-            else if(left instanceof String && right instanceof String) {
+            if((leftIsNull || left instanceof String) && (rightIsNull || right instanceof String)) {
                 return ((String)left) > ((String)right);
             }
-            else if(left instanceof Date && right instanceof Date) {
+            if((leftIsNull || left instanceof Date) && (rightIsNull || right instanceof Date)) {
                 return ((Date)left) > ((Date)right);
             }
-            else if(left instanceof Time && right instanceof Time) {
+            if((leftIsNull || left instanceof Time) && (rightIsNull || right instanceof Time)) {
                 return ((Time)left) > ((Time)right);
             }
-            else if(left instanceof Datetime && right instanceof Datetime) {
+            if((leftIsNull || left instanceof Datetime) && (rightIsNull || right instanceof Datetime)) {
                 return ((Datetime)left) > ((Datetime)right);
             }
-            else {
-                throw new EvalException('Failed to execute ">" on objects');
-            }
+            throw new EvalException('Failed to execute ">" on objects');
+
         }
-        else if(operator == '<=') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '<=') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) <= ((Decimal)right);
             }
-            else if(left instanceof String && right instanceof String) {
+            if((leftIsNull || left instanceof String) && (rightIsNull || right instanceof String)) {
                 return ((String)left) <= ((String)right);
             }
-            else if(left instanceof Date && right instanceof Date) {
+            if((leftIsNull || left instanceof Date) && (rightIsNull || right instanceof Date)) {
                 return ((Date)left) <= ((Date)right);
             }
-            else if(left instanceof Time && right instanceof Time) {
+            if((leftIsNull || left instanceof Time) && (rightIsNull || right instanceof Time)) {
                 return ((Time)left) <= ((Time)right);
             }
-            else if(left instanceof Datetime && right instanceof Datetime) {
+            if((leftIsNull || left instanceof Datetime) && (rightIsNull || right instanceof Datetime)) {
                 return ((Datetime)left) <= ((Datetime)right);
             }
-            else {
-                throw new EvalException('Failed to execute "<=" on objects');
-            }
+            throw new EvalException('Failed to execute "<=" on objects');
+
         }
-        else if(operator == '>=') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '>=') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) >= ((Decimal)right);
             }
-            else if(left instanceof String && right instanceof String) {
+            if((leftIsNull || left instanceof String) && (rightIsNull || right instanceof String)) {
                 return ((String)left) >= ((String)right);
             }
-            else if(left instanceof Date && right instanceof Date) {
+            if((leftIsNull || left instanceof Date) && (rightIsNull || right instanceof Date)) {
                 return ((Date)left) >= ((Date)right);
             }
-            else if(left instanceof Time && right instanceof Time) {
+            if((leftIsNull || left instanceof Time) && (rightIsNull || right instanceof Time)) {
                 return ((Time)left) >= ((Time)right);
             }
-            else if(left instanceof Datetime && right instanceof Datetime) {
+            if((leftIsNull || left instanceof Datetime) && (rightIsNull || right instanceof Datetime)) {
                 return ((Datetime)left) >= ((Datetime)right);
             }
-            else {
-                throw new EvalException('Failed to execute ">=" on objects');
-            }
+            throw new EvalException('Failed to execute ">=" on objects');
         }
-        else if(operator == '+') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '+') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) + ((Decimal)right);
             }
-            else if(left instanceof String && right instanceof String) {
+            if((leftIsNull || left instanceof String) && (rightIsNull || right instanceof String)) {
                 return ((String)left) + ((String)right);
             }
-            else {
-                return String.valueOf(left) + String.valueOf(right);
-            }
+            return String.valueOf(left) + String.valueOf(right);
+
         }
-        else if(operator == '-') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '-') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) - ((Decimal)right);
             }
-            else {
-                throw new EvalException('Failed to execute "-" on objects');
-            }
+            throw new EvalException('Failed to execute "-" on objects');
+
         }
-        else if(operator == '*') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '*') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) * ((Decimal)right);
             }
-            else {
-                throw new EvalException('Failed to execute "*" on objects');
-            }
+            throw new EvalException('Failed to execute "*" on objects');
         }
-        else if(operator == '/') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '/') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return ((Decimal)left) / ((Decimal)right);
             }
-            else {
-                throw new EvalException('Failed to execute "/" on objects');
-            }
+            throw new EvalException('Failed to execute "/" on objects');
         }
-        else if(operator == '%') {
-            if(left instanceof Decimal && right instanceof Decimal) {
+        if(operator == '%') {
+            if((leftIsNull || left instanceof Decimal) && (rightIsNull || right instanceof Decimal)) {
                 return Math.mod(((Decimal)left).longValue(), ((Decimal)right).longValue());
             }
-            else {
-                throw new EvalException('Failed to execute "%" on objects');
-            }
+            throw new EvalException('Failed to execute "%" on objects');
         }
-        else {
-            throw new EvalException('Unsupported operator for "' + operator + '"');
-        }
+        throw new EvalException('Unsupported operator for "' + operator + '"');
+
     }
 
     public Object eval(Jsep.LogicalExpressionNode node, Map<String, Object> context) {
         Object left = this.eval(node.left, context);
         Object right = this.eval(node.right, context);
         String operator = node.operator;
+
+        Boolean leftIsNull = (left == null);
+        Boolean rightIsNull = (right == null);
+
         if(operator == '&&') {
-            if(left instanceof Boolean && right instanceof Boolean) {
+            if((leftIsNull || left instanceof Boolean) && (rightIsNull || right instanceof Boolean)) {
                 return ((Boolean)left) && ((Boolean)right);
             }
-            else {
-                throw new EvalException('Failed to execute "&&" on non-boolean');
-            }
+            throw new EvalException('Failed to execute "&&" on non-boolean');
         }
-        else if(operator == '||') {
-            if(left instanceof Boolean && right instanceof Boolean) {
+        if(operator == '||') {
+            if((leftIsNull || left instanceof Boolean) && (rightIsNull || right instanceof Boolean)) {
                 return ((Boolean)left) || ((Boolean)right);
             }
-            else {
-                throw new EvalException('Failed to execute "||" on non-boolean');
-            }
+            throw new EvalException('Failed to execute "||" on non-boolean');
         }
-        else {
-            throw new EvalException('Unsupported operator for "' + operator + '"');
-        }
+        throw new EvalException('Unsupported operator for "' + operator + '"');
     }
 
     public Object eval(Jsep.AssignmentExpressionNode node, Map<String, Object> context) {
@@ -407,13 +410,11 @@ public virtual class ScriptEngine {
             if((Boolean)test) {
                 return this.eval(node.consequent, context);
             }
-            else {
-                return this.eval(node.alternate, context);
-            }
+            return this.eval(node.alternate, context);
+
         }
-        else {
-            throw new EvalException('Failed to execute conditional expression as test is not boolean');
-        }
+        throw new EvalException('Failed to execute conditional expression as test is not boolean');
+
     }
 
     public Object eval(Jsep.ArrayExpressionNode node, Map<String, Object> context) {
@@ -421,7 +422,6 @@ public virtual class ScriptEngine {
         for(Jsep.Node elementNode : node.elements) {
             mList.add(this.eval(elementNode, context));
         }
-
         return mList;
     }
 
@@ -436,10 +436,8 @@ public virtual class ScriptEngine {
             else {
                 keyStr = ((Jsep.IdentifierNode)key).name;
             }
-
             mMap.put(keyStr, this.eval(value, context));
         }
-
         return mMap;
     }
 
