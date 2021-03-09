@@ -22,7 +22,7 @@
  * SOFTWARE.
  **/
 @IsTest
-private class ScriptEngine_Test {
+private class ScriptEngineTest {
     static ScriptEngine se = ScriptEngine.getInstance();
     @IsTest
     private static void objectTest() {
