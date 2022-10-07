@@ -680,9 +680,7 @@ public class Jsep {
 
     private static Boolean isIdentifierStart(Integer ch) {
         return (ch == 36) || (ch == 95) || // `$` and `_`
-            (ch >= 65 && ch <= 90) || // A...Z
-            (ch >= 97 && ch <= 122) || // a...z
-            (ch >= 128 && !binary_ops.containsKey(fromCharCode(ch))); // any non-ASCII that is not an operator
+            fromCharCode(ch).isAlpha()
     }
 
     private static Boolean isIdentifierPart(Integer ch) {
